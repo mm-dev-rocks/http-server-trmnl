@@ -1,0 +1,69 @@
+digraph http_server {
+    rankdir = TB
+    node [shape = box]
+
+    subgraph cluster_socket {
+        label = "Socket layer\n(socket → bind → listen → accept)"
+        server_init; accept_loop; server_cleanup
+    }
+
+    subgraph cluster_connection {
+        label = "Connection\n(own a client fd end-to-end)"
+        handle_connection; connection_close
+    }
+
+    subgraph cluster_parsing {
+        // Read in a loop until \r\n\r\n, then check Content-Length for body
+        label = "HTTP parsing\n(read loop → request line → headers → body)"
+        parse_request; parse_headers; read_body
+    }
+
+    subgraph cluster_router {
+        label = "Router\n(match method + path to handler)"
+        register_route; route
+    }
+
+    subgraph cluster_response {
+        // Status line + headers + blank line + body, sent in a write() loop
+        label = "Response\n(build buffer → write() loop → socket)"
+        build_response; send_response
+    }
+
+    subgraph cluster_image {
+        // Write BMP header by hand; set Content-Type: image/bmp + Content-Length
+        label = "Image generation\n(draw into pixel buffer → BMP)"
+        generate_image; serve_image
+    }
+
+    subgraph cluster_data {
+        // Acts as an HTTP client: connect() → GET → read response → parse JSON
+        label = "Data fetching\n(outbound HTTP client → JSON parse)"
+        fetch_data; parse_json
+    }
+
+    // entry
+    main -> server_init
+    main -> register_route
+    main -> accept_loop
+    main -> server_cleanup
+
+    // request pipeline
+    accept_loop       -> handle_connection
+    handle_connection -> parse_request
+    parse_request     -> parse_headers
+    parse_headers     -> read_body
+    read_body         -> route
+
+    // route: static response or image
+    route             -> build_response
+    route             -> generate_image
+    generate_image    -> serve_image
+    serve_image       -> connection_close
+
+    build_response    -> send_response
+    send_response     -> connection_close
+
+    // data fetching feeds image generation
+    fetch_data  -> parse_json
+    parse_json  -> generate_image
+}

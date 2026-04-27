@@ -1,0 +1,45 @@
+digraph http_server {
+    rankdir = TB
+    node [shape = box]
+
+    subgraph cluster_socket {
+        label = "Socket layer\n(create, bind, listen, accept)"
+        server_init; accept_loop; server_cleanup
+    }
+
+    subgraph cluster_connection {
+        label = "Connection\n(own a client fd end-to-end)"
+        handle_connection; connection_close
+    }
+
+    subgraph cluster_parsing {
+        label = "HTTP parsing\n(request line, headers, body)"
+        parse_request; parse_headers; read_body
+    }
+
+    subgraph cluster_router {
+        label = "Router\n(match method + path to handler)"
+        register_route; route
+    }
+
+    subgraph cluster_response {
+        label = "Response\n(serialise and write to socket)"
+        build_response; send_response
+    }
+
+    // entry
+    main -> server_init
+    main -> register_route
+    main -> accept_loop
+    main -> server_cleanup
+
+    // pipeline
+    accept_loop       -> handle_connection
+    handle_connection -> parse_request
+    parse_request     -> parse_headers
+    parse_headers     -> read_body
+    read_body         -> route
+    route             -> build_response
+    build_response    -> send_response
+    send_response     -> connection_close
+}
