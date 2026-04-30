@@ -2,7 +2,7 @@
 #define TEST_H
 
 /*
- * Minimal test harness - no dependencies, just C89 standard library.
+ * Minimal test harness - no dependencies
  *
  * Usage:
  *   TEST("it parses the method") {
@@ -13,43 +13,43 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-/* Global counters - defined in test runner's main() translation unit */
+// Global counters - defined in test runner's main() translation unit
 static int tests_run = 0;
 static int tests_passed = 0;
 static int tests_failed = 0;
 
-#define TEST(name)                                                             \
-  do {                                                                         \
-    int _test_ok = 1;                                                          \
-    tests_run++;                                                               \
-    printf("  [ ] %s ... ", name);                                             \
-    fflush(stdout);
+#define TEST(name)                                                                                 \
+    do {                                                                                           \
+        int _test_ok = 1;                                                                          \
+        tests_run++;                                                                               \
+        printf(" - %s ... ", name);                                                             \
+        fflush(stdout);
 
-#define CHECK(expr)                                                            \
-  if (!(expr)) {                                                               \
-    _test_ok = 0;                                                              \
-    printf("\n      FAIL: %s:%d: %s", __FILE__, __LINE__, #expr);              \
-  }
+#define CHECK(expr)                                                                                \
+    if (!(expr)) {                                                                                 \
+        _test_ok = 0;                                                                              \
+        printf("\n      FAIL: %s:%d: %s", __FILE__, __LINE__, #expr);                              \
+    }
 
-#define END_TEST                                                               \
-  if (_test_ok) {                                                              \
-    tests_passed++;                                                            \
-    printf("OK\n");                                                            \
-  } else {                                                                     \
-    tests_failed++;                                                            \
-    printf("\n");                                                              \
-  }                                                                            \
-  }                                                                            \
-  while (0)
+#define END_TEST                                                                                   \
+    if (_test_ok) {                                                                                \
+        tests_passed++;                                                                            \
+        printf("PASS\n");                                                                            \
+    } else {                                                                                       \
+        tests_failed++;                                                                            \
+        printf("\n");                                                                              \
+    }                                                                                              \
+    }                                                                                              \
+    while (0)
 
-#define PRINT_SUMMARY()                                                        \
-  do {                                                                         \
-    printf("\n%d/%d passed", tests_passed, tests_run);                         \
-    if (tests_failed) {                                                        \
-      printf(", %d FAILED\n", tests_failed);                                   \
-      return 1;                                                                \
-    }                                                                          \
-    printf("\n");                                                              \
-  } while (0)
+#define PRINT_SUMMARY()                                                                            \
+    do {                                                                                           \
+        printf("\n%d/%d passed", tests_passed, tests_run);                                         \
+        if (tests_failed) {                                                                        \
+            printf(", %d FAILED\n", tests_failed);                                                 \
+            return 1;                                                                              \
+        }                                                                                          \
+        printf("\n");                                                                              \
+    } while (0)
 
-#endif /* TEST_H */
+#endif // TEST_H

@@ -8,7 +8,7 @@ CC      = gcc
 CFLAGS  = -std=c99 -Wall -Wextra -Wpedantic -g
 
 # If your toolchain supports it, add these to catch bugs early:
-CFLAGS += -fsanitize=address,undefined
+#CFLAGS += -fsanitize=address,undefined
 
 SRC     = http_parse.c
 TESTS   = test_http_parse

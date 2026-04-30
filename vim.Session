@@ -13,20 +13,26 @@ if &shortmess =~ 'A'
 else
   set shortmess=aoO
 endif
-badd +0 http_parse.c
-badd +0 http_parse.h
-badd +0 Makefile
-badd +0 test.h
-badd +0 test_http_parse.c
+badd +1 http_parse.c
+badd +1 http_parse.h
+badd +1 test.h
+badd +101 test_http_parse.c
+badd +11 Makefile
+badd +41 platform.h
 argglobal
 %argdel
 $argadd http_parse.c
 $argadd http_parse.h
-$argadd Makefile
+$argadd 000-ASSETS/main.c
 $argadd test.h
 $argadd test_http_parse.c
-edit http_parse.c
+edit Makefile
 argglobal
+if bufexists(fnamemodify("Makefile", ":p")) | buffer Makefile | else | edit Makefile | endif
+if &buftype ==# 'terminal'
+  silent file Makefile
+endif
+balt test_http_parse.c
 setlocal foldmethod=manual
 setlocal foldexpr=0
 setlocal foldmarker={{{,}}}
@@ -37,11 +43,11 @@ setlocal foldnestmax=20
 setlocal nofoldenable
 silent! normal! zE
 let &fdl = &fdl
-let s:l = 1 - ((0 * winheight(0) + 16) / 33)
+let s:l = 11 - ((10 * winheight(0) + 15) / 30)
 if s:l < 1 | let s:l = 1 | endif
 keepjumps exe s:l
 normal! zt
-keepjumps 1
+keepjumps 11
 normal! 0
 tabnext 1
 if exists('s:wipebuf') && len(win_findbuf(s:wipebuf)) == 0 && getbufvar(s:wipebuf, '&buftype') isnot# 'terminal'

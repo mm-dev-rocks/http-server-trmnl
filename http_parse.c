@@ -2,20 +2,20 @@
 #include <string.h>
 
 /*
- * copy_token - copy at most (max-1) chars from src into dst, stopping at
- * the first space, \r, \n, or \0.  Always null-terminates dst.
+ * copy_token - copy at most (maxlen - 1) chars from src into dst, stopping at the first space, \r,
+ * \n, or \0.  Always null-terminates dst.
  *
- * Returns the number of characters copied (not counting the terminator),
- * or -1 if the token was empty or too long for the buffer.
+ * Returns the number of characters copied (not counting the terminator), or -1 if the token was
+ * empty or too long for the buffer.
  *
  * This is a local helper; it is not exposed in the header.
  */
-static int copy_token(const char *src, char *dst, int max) {
+static int copy_token(const char *src, char *dst, int maxlen) {
     int i = 0;
 
     while (src[i] != ' ' && src[i] != '\r' && src[i] != '\n' && src[i] != '\0') {
-        if (i >= max - 1) {
-            // token longer than buffer
+        if (i == maxlen - 1) {
+            // Token too long to fit with null terminator
             dst[0] = '\0';
             return -1;
         }
@@ -24,35 +24,41 @@ static int copy_token(const char *src, char *dst, int max) {
     }
 
     dst[i] = '\0';
-    return (i == 0) ? -1 : i; /* empty token is an error */
+
+    // empty token is an error
+    return (i == 0) ? -1 : i;
 }
 
-int http_parse_request_line(const char *src, struct http_request_head *out) {
-    const char *p; /* walking pointer through src */
+int http_parse_request_line(const char *src, struct http_request_line *out) {
+    // Pointer to walk through `src`
+    const char *p;
     int len;
 
-    /* --- guard clauses: reject obviously bad input early --- */
+    // Guard clauses: reject obviously bad input early
     if (src == NULL || src[0] == '\0') {
         return -1;
     }
 
     p = src;
 
-    /* --- token 1: method --- */
-    len = copy_token(p, out->method, HTTP_METHOD_MAX);
+    // Token 1: method
+    len = copy_token(p, out->method, HTTP_METHOD_MAXLEN);
     if (len < 0) {
         return -1;
     }
 
-    p += len; /* advance past the method chars */
+    // Advance past the method chars
+    p += len;
 
     if (*p != ' ') {
-        return -1; /* must be followed by a single space */
+        // Must be followed by a single space
+        return -1;
     }
-    p++; /* skip the space */
+    // Skip the space
+    p++;
 
-    /* --- token 2: path --- */
-    len = copy_token(p, out->path, HTTP_PATH_MAX);
+    // Token 2: path
+    len = copy_token(p, out->path, HTTP_PATH_MAXLEN);
     if (len < 0) {
         return -1;
     }
@@ -63,17 +69,15 @@ int http_parse_request_line(const char *src, struct http_request_head *out) {
     }
     p++;
 
-    /* --- token 3: HTTP version --- */
-    len = copy_token(p, out->version, HTTP_VERSION_MAX);
+    // Token 3: HTTP version
+    len = copy_token(p, out->version, HTTP_VERSION_MAXLEN);
     if (len < 0) {
         return -1;
     }
     p += len;
 
-    /*
-     * After the three tokens we expect either \r\n or \n.
-     * Anything else means there was a 4th token or junk on the line.
-     */
+    // After the three tokens we expect either \r\n or \n.
+    // Anything else means there was a 4th token or junk on the line.
     if (*p == '\r') {
         p++;
     }
