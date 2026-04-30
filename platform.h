@@ -1,3 +1,8 @@
+/* Pull in __GLIBC__ and __GLIBC_MINOR__ on Linux */
+#if defined(__linux__)
+#include <features.h>
+#endif
+
 #ifndef PLATFORM_H
 #define PLATFORM_H
 
