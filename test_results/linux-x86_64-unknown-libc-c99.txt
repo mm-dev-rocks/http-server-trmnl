@@ -1,0 +1,11 @@
+=== http_parse_request_line ===
+ - parses a simple GET request ... PASS
+ - parses a POST request ... PASS
+ - parses a root path ... PASS
+ - parses a path with query string ... PASS
+ - returns -1 for empty input ... PASS
+ - returns -1 when method is missing ... PASS
+ - returns -1 when version is missing ... PASS
+ - returns -1 for NULL input ... PASS
+
+8/8 passed
