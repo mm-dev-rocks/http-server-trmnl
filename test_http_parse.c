@@ -11,13 +11,27 @@
  *   - treat malformed input as an error
  */
 
-int main(void) {
+// ESP-IDF uses `app_main` instead of `main`
+// On a hosted platform, main() returns an int to the operating system — that's the exit code. 0
+// means success, non-zero means something went wrong. The OS receives it and can act on it, for
+// example your Makefile uses || exit 1 to stop if a test binary returns non-zero. On the ESP32
+// there's no OS to return to. app_main() is called by ESP-IDF's startup code and when it returns,
+// the firmware either loops forever or reboots — there's nowhere to send a return code. So void
+// makes sense.
+#ifdef CONFIG_IDF_TARGET_ESP32
+void app_main(void)
+#else
+int main(void)
+#endif
+{
+#ifndef CONFIG_IDF_TARGET_ESP32
     // Make a filename representing the current system
     char filename[256];
     snprintf(filename, sizeof(filename), "test_results/%s-%s-%s-%s.txt", PLATFORM_OS, PLATFORM_ARCH,
              PLATFORM_LIBC, PLATFORM_CSTD);
     // `freopen` redirects stdout to the file
     freopen(filename, "w", stdout);
+#endif
 
     printf("=== http_parse_request_line ===\n");
 
@@ -99,5 +113,5 @@ int main(void) {
     END_TEST;
 
     PRINT_SUMMARY();
-    return 0;
+    RETURN_SUCCESS();
 }

@@ -13,6 +13,15 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#ifdef CONFIG_IDF_TARGET_ESP32
+    // In `app_main` on esp32 we can't return ints (there's no OS to receive them)
+    #define RETURN_FAILURE()
+    #define RETURN_SUCCESS()
+#else
+    #define RETURN_FAILURE() return 1
+    #define RETURN_SUCCESS() return 0
+#endif
+
 // Global counters - defined in test runner's main() translation unit
 static int tests_run = 0;
 static int tests_passed = 0;
@@ -47,7 +56,7 @@ static int tests_failed = 0;
         printf("\n%d/%d passed", tests_passed, tests_run);                                         \
         if (tests_failed) {                                                                        \
             printf(", %d FAILED\n", tests_failed);                                                 \
-            return 1;                                                                              \
+            RETURN_FAILURE();                                                                              \
         }                                                                                          \
         printf("\n");                                                                              \
     } while (0)
