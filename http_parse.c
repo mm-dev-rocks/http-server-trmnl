@@ -29,10 +29,19 @@ static int copy_token(const char *src, char *dst, int maxlen) {
     return (i == 0) ? -1 : i;
 }
 
+//
+static int parse_token(const char **p, char *dest, int maxlen) {
+    int len = copy_token(*p, dest, maxlen);
+    if (len < 0) {
+        return -1;
+    }
+    *p += len;
+    return 0;
+}
+
 int http_parse_request_line(const char *src, struct http_request_line *out) {
     // Pointer to walk through `src`
     const char *p;
-    int len;
 
     // Guard clauses: reject obviously bad input early
     if (src == NULL || src[0] == '\0') {
@@ -42,13 +51,9 @@ int http_parse_request_line(const char *src, struct http_request_line *out) {
     p = src;
 
     // Token 1: method
-    len = copy_token(p, out->method, HTTP_METHOD_MAXLEN);
-    if (len < 0) {
+    if (parse_token(&p, out->method, HTTP_METHOD_MAXLEN) < 0) {
         return -1;
     }
-
-    // Advance past the method chars
-    p += len;
 
     if (*p != ' ') {
         // Must be followed by a single space
@@ -58,11 +63,9 @@ int http_parse_request_line(const char *src, struct http_request_line *out) {
     p++;
 
     // Token 2: path
-    len = copy_token(p, out->path, HTTP_PATH_MAXLEN);
-    if (len < 0) {
+    if (parse_token(&p, out->path, HTTP_PATH_MAXLEN) < 0) {
         return -1;
     }
-    p += len;
 
     if (*p != ' ') {
         return -1;
@@ -70,11 +73,9 @@ int http_parse_request_line(const char *src, struct http_request_line *out) {
     p++;
 
     // Token 3: HTTP version
-    len = copy_token(p, out->version, HTTP_VERSION_MAXLEN);
-    if (len < 0) {
+    if (parse_token(&p, out->version, HTTP_VERSION_MAXLEN) < 0) {
         return -1;
     }
-    p += len;
 
     // After the three tokens we expect either \r\n or \n.
     // Anything else means there was a 4th token or junk on the line.
