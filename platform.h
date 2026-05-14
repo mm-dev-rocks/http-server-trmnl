@@ -28,6 +28,8 @@
 #define PLATFORM_ARCH "arm64"
 #elif defined(__arm__) || defined(_M_ARM)
 #define PLATFORM_ARCH "arm32"
+#elif defined(__XTENSA__)
+#define PLATFORM_ARCH "xtensa"
 #else
 #define PLATFORM_ARCH "unknown-arch"
 #endif
@@ -55,7 +57,5 @@
 #else
 #define PLATFORM_CSTD "unknown-std"
 #endif
-
-#define FILENAME OS "-" ARCH "-" LIBC "-" CSTD ".txt"
 
 #endif // PLATFORM_H

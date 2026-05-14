@@ -1,4 +1,4 @@
-=== http_parse_request_line ===
+=== parse_request_line ===
  - parses a simple GET request ... PASS
  - parses a POST request ... PASS
  - parses a root path ... PASS
@@ -9,3 +9,13 @@
  - returns -1 for NULL input ... PASS
 
 8/8 passed
+
+=== parse_request_headers ===
+ - parses a single header ... PASS
+ - returns -1 for space before header name ... rc=-1
+PASS
+ - parses 7 headers ... rc=7
+PASS
+
+3/3 passed
+

@@ -14,12 +14,12 @@
 #include <stdlib.h>
 
 #ifdef CONFIG_IDF_TARGET_ESP32
-    // In `app_main` on esp32 we can't return ints (there's no OS to receive them)
-    #define RETURN_FAILURE()
-    #define RETURN_SUCCESS()
+// In `app_main` on esp32 we can't return ints (there's no OS to receive them)
+#define RETURN_FAILURE()
+#define RETURN_SUCCESS()
 #else
-    #define RETURN_FAILURE() return 1
-    #define RETURN_SUCCESS() return 0
+#define RETURN_FAILURE() return 1
+#define RETURN_SUCCESS() return 0
 #endif
 
 // Global counters - defined in test runner's main() translation unit
@@ -31,7 +31,7 @@ static int tests_failed = 0;
     do {                                                                                           \
         int _test_ok = 1;                                                                          \
         tests_run++;                                                                               \
-        printf(" - %s ... ", name);                                                             \
+        printf(" - %s ... ", name);                                                                \
         fflush(stdout);
 
 #define CHECK(expr)                                                                                \
@@ -43,7 +43,7 @@ static int tests_failed = 0;
 #define END_TEST                                                                                   \
     if (_test_ok) {                                                                                \
         tests_passed++;                                                                            \
-        printf("PASS\n");                                                                            \
+        printf("PASS\n");                                                                          \
     } else {                                                                                       \
         tests_failed++;                                                                            \
         printf("\n");                                                                              \
@@ -53,10 +53,10 @@ static int tests_failed = 0;
 
 #define PRINT_SUMMARY()                                                                            \
     do {                                                                                           \
-        printf("\n%d/%d passed", tests_passed, tests_run);                                         \
+        printf("\n%d/%d passed\n", tests_passed, tests_run);                                       \
         if (tests_failed) {                                                                        \
             printf(", %d FAILED\n", tests_failed);                                                 \
-            RETURN_FAILURE();                                                                              \
+            RETURN_FAILURE();                                                                      \
         }                                                                                          \
         printf("\n");                                                                              \
     } while (0)
